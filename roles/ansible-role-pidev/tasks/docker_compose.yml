@@ -1,0 +1,31 @@
+---
+- name: this block contains tasks related to docker_compose
+  block:
+
+    - name: ensure directory is in place to store docker/compose installation files
+      file:
+        dest: "{{ pidev_user.homedir }}/.install/docker/compose"
+        state: "directory"
+      become: true
+      become_user: "{{ pidev_user.name }}"
+      become_method: "su"
+    
+    - name: determine the latest docker/compose release from github
+      shell: 'curl -s https://github.com/docker/compose/releases/latest/ | grep -oP "(?<=(tag/)).*(?=(\"))"'
+      args:
+        warn: false
+      changed_when: false
+      register: docker_compose_latest
+      become: true
+      become_user: "{{ pidev_user.name }}"
+      become_method: "su"
+    
+    - name: ensure the latest docker/compose release is installed from github
+      get_url:
+        url: "https://github.com/docker/compose/releases/download/{{ docker_compose_latest.stdout }}/docker-compose-Linux-x86_64"
+        dest: "/usr/local/bin/docker-compose"
+        mode: "0755"
+
+  tags:
+    - docker_compose
+...

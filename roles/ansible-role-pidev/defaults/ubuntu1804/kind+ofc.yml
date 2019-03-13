@@ -1,0 +1,43 @@
+---
+pidev_sudogroup: "sudo"
+
+pidev_daemons:
+  - docker
+
+pidev_bashrc_extensions:
+  - localbins
+  - gopath
+
+pidev_packages:
+ # misc requirements
+  - bash-completion
+  - tree
+  - vim
+  - git
+  - git-flow
+  - nmap
+  - htop
+  - clusterssh
+  - tmux
+  - screen
+  - jq
+  - gdebi
+  - apt-file
+  - firewalld
+  - gcc
+  - apt-transport-https
+  - software-properties-common
+  - ca-certificates
+  - curl
+  - gnupg-agent
+  - bridge-utils
+  - linux-headers-{{ lookup('pipe','uname -r') }}
+  - make
+  - snapd
+  - golang
+  - go-dep
+ # docker requirements
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+

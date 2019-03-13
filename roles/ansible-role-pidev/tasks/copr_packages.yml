@@ -1,0 +1,21 @@
+---
+- name: this block contains tasks related to copr_packages
+  block:
+
+    - name: ensure required copr repositories are enabled
+      shell: "yum copr -y enable {{ item.org_name }}/{{ item.name }}"
+      args:
+        warn: false
+        creates: "/etc/yum.repos.d/_copr_{{ item.org_name }}-{{ item.name }}.repo"
+      loop: "{{ pidev_copr }}"
+
+    - name: ensure copr-provided system packages are installed
+      yum:
+        name: "{{ item.packages }}"
+        state: "present"
+      loop: "{{ pidev_copr }}"
+      vars:
+        ansible_python_interpreter: "/usr/bin/python2.7"
+        
+  tags:
+    - copr_packages

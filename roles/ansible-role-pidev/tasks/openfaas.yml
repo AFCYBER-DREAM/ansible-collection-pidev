@@ -1,0 +1,125 @@
+---
+- name: this block contains tasks related to openfaas
+  block:
+    - name: get current zones associated with internal zone
+      shell: "firewall-cmd --zone=internal --list-interfaces"
+      changed_when: false
+      register: internal_interfaces
+    
+    - name: get list of all enabled services on firewall internal zone
+      shell: "firewall-cmd --zone=internal --list-services"
+      changed_when: false
+      register: get_fw_internal_services
+    
+    - name: get list of all enabled ports on firewall internal zone
+      shell: "firewall-cmd --zone=internal --list-ports"
+      changed_when: false
+      register: get_fw_internal_ports
+    
+    - name: get list of all enabled ports on firewall public zone
+      shell: "firewall-cmd --list-ports"
+      changed_when: false
+      register: get_fw_default_ports
+    
+  # - name: ensure required services enabled on internal firewall zone
+  #   shell: "firewall-cmd --permanent --zone=internal --add-service={{ item }}"
+  #   when: item not in get_fw_internal_services.stdout
+  #   with_items:
+  #   notify: reload firewalld
+    
+    - name: ensure required ports enabled on internal firewall zone
+      shell: "firewall-cmd --permanent --zone=internal --add-port={{ item }}"
+      when: item not in get_fw_internal_ports.stdout
+      with_items:
+        - "80/tcp"
+        - "7946/tcp"
+        - "4789/tcp"
+        - "2376/tcp"
+        - "2376/tcp"
+        - "2377/tcp"
+        - "8080/tcp"
+      notify:
+        - reload firewalld
+        - restart docker
+    
+  # - name: ensure required services enabled on default firewall zone
+  #   shell: "firewall-cmd --permanent --zone=internal --add-service={{ item }}"
+  #   when: item not in get_fw_internal_services.stdout
+  #   with_items:
+  #   notify: reload firewalld
+    
+    - name: ensure required ports enabled on default firewall zone
+      shell: "firewall-cmd --permanent --add-port={{ item }}"
+      when: item not in get_fw_default_ports.stdout
+      with_items:
+        - "80/tcp"
+        - "7946/tcp"
+        - "4789/tcp"
+        - "2376/tcp"
+        - "2376/tcp"
+        - "2377/tcp"
+        - "8080/tcp"
+      notify:
+        - reload firewalld
+        - restart docker
+    
+    - meta: flush_handlers
+
+    - name: determine public ip address of node
+      shell: "curl -s ipv4.icanhazip.com"
+      register: icanhazip
+      changed_when: false
+
+    - name: ensure docker swarm is initialized
+      docker_swarm:
+        state: "present"
+        advertise_addr: "{{ icanhazip.stdout }}"
+      become: true
+      become_user: "{{ pidev_user.name }}"
+      become_method: "su"
+      register: swarm_init
+
+    - name: ensure latest versions of openfaas/faas repo has been git cloned
+      git:
+        repo: "https://github.com/openfaas/faas.git"
+        dest: "{{ pidev_user.homedir }}/openfaas/faas/"
+        clone: "yes"
+        force: "yes"
+      become: true
+      become_user: "{{ pidev_user.name }}"
+      become_method: "su"
+
+    - name: ensure poc openfaas docker swarm based installation is deployed/updated (not idempotent)
+      shell: "./deploy_stack.sh --no-auth"
+      args:
+        chdir: "{{ pidev_user.homedir }}/openfaas/faas/"
+      become: true
+      become_user: "{{ pidev_user.name}}"
+      become_method: "su"
+      register: faas_deploy
+      failed_when: false
+
+    - name: check faas-cli version (before upgrade/install attempt)
+      shell: "faas-cli version"
+      register: faas_cli_vers_before
+      changed_when: false
+      failed_when: false
+
+    - name: ensure faas-cli is installed and updated
+      shell: "curl -sL https://cli.openfaas.com | bash"
+      changed_when: false
+
+    - name: check faas-cli version (after upgrade/install attempt)
+      shell: "faas-cli version"
+      register: faas_cli_vers_after
+      changed_when: false
+      failed_when: false
+
+    - name: check faas-cli version (before upgrade/install attempt)
+      debug:
+        msg: "faas-cli was installed/updated."
+      when: faas_cli_vers_before == faas_cli_vers_after
+
+  tags:
+    - openfaas
+...

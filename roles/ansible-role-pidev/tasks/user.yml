@@ -1,0 +1,14 @@
+---
+- name: this block contains tasks related to user
+  block:
+
+    - name: ensure pied piper development user exists
+      user:
+        name: "{{ pidev_user.name }}"
+        state: "present"
+        groups:
+          - "{{ pidev_sudogroup }}"
+        append: true
+
+  tags:
+    - user

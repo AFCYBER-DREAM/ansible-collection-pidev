@@ -1,0 +1,68 @@
+---
+- name: this block contains tasks related to bashrc
+  block:
+
+    - name: ensure user main ~/.bashrc is sourcing ~/.bashrc.d/
+      lineinfile:
+        path: "{{ pidev_user.homedir }}/.bashrc"
+        state: "present"
+        line: "for rcfile in $(ls /home/pidev/.bashrc.d/*.bashrc); do source $rcfile; done"
+      vars:
+        ansible_python_interpreter: "/usr/bin/python2.7"
+      become: true
+      become_user: "{{ item }}"
+      become_method: "sudo"
+      loop:
+        - root
+        - "{{ pidev_user.name }}"
+    
+    - name: ensure bashrc extension directory (~/.bashrc.d/) exists for root user
+      file:
+        name: "/root/.bashrc.d/"
+        state: "directory"
+        owner: "root"
+        group: "root"
+        mode: "0750"
+      vars:
+        ansible_python_interpreter: "/usr/bin/python2.7"
+      become: false
+    
+    - name: ensure bashrc extension directory (~/.bashrc.d/) exists for pidev user
+      file:
+        name: "{{ pidev_user.homedir }}/.bashrc.d/"
+        state: "directory"
+        owner: "{{ pidev_user.name }}"
+        group: "{{ pidev_user.name }}"
+        mode: "0750"
+      vars:
+        ansible_python_interpreter: "/usr/bin/python2.7"
+      become: true
+      become_user: "{{ pidev_user.name }}"
+      become_method: "sudo"
+    
+    - name: ensure .bashrc extensions are present and latest for pidev user
+      template:
+        src: "templates/{{ item }}.bashrc.j2"
+        dest: "{{ pidev_user.homedir }}/.bashrc.d/{{ item }}.bashrc"
+      with_items:
+        - "{{ pidev_bashrc_extensions }}"
+      vars:
+        ansible_python_interpreter: "/usr/bin/python2.7"
+      become: true
+      become_user: "{{ pidev_user.name }}"
+      become_method: "su"
+
+    - name: ensure .bashrc extensions are present and latest for root user
+      template:
+        src: "templates/{{ item }}.bashrc.j2"
+        dest: "/root/.bashrc.d/{{ item }}.bashrc"
+      loop:
+        - scl
+        - localbins
+      vars:
+        ansible_python_interpreter: "/usr/bin/python2.7"
+      become: false
+
+  tags:
+    - bashrc
+...

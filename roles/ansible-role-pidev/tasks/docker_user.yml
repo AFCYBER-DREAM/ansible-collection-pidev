@@ -1,0 +1,19 @@
+---
+- name: this block contains tasks related to docker_compose
+  block:
+
+    - name: ensure docker group is created
+      group:
+        name: "docker"
+        state: "present"
+    
+    - name: ensure docker user is added to docker group
+      user:
+        name: "{{ pidev_user.name }}"
+        groups:
+          - "docker"
+        append: true
+
+  tags:
+    - docker_user
+...
