@@ -7,6 +7,7 @@
         repo: "https://github.com/{{ item.org_name }}/{{ item.name }}.git"
         dest: "{{ pidev_user.homedir }}/{{ item.org_name }}/{{ item.name }}/"
         clone: "yes"
+        version: "{{ item.version | default(omit) }}"
         force: "yes"
       with_items:
         - "{{ pidev_piedpiper_cli }}"
