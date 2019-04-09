@@ -6,6 +6,7 @@
       git:
         repo: "https://github.com/{{ item.org_name }}/{{ item.name }}.git"
         dest: "{{ pidev_user.homedir }}/{{ item.org_name }}/{{ item.name }}/"
+        version: "{{ item.version | default(omit) }}"
         clone: "yes"
         force: "yes"
       with_items:

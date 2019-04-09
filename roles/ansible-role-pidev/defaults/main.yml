@@ -18,13 +18,18 @@ pidev_docker_images:
 pidev_piedpiper_cli:
   - name: piedpiper-picli
     org_name: afcyber-dream 
+    version: master
 
 pidev_piedpiper_faas:
   - name: piedpiper-validator-faas
     org_name: afcyber-dream 
+    version: master
   - name: piedpiper-cpplint-faas
     org_name: afcyber-dream 
+    version: master
   - name: piedpiper-flake8-faas
     org_name: afcyber-dream 
+    version: master
   - name: piedpiper-pylint-faas
     org_name: afcyber-dream 
+    version: master
