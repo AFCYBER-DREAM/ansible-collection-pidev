@@ -1,0 +1,28 @@
+---
+- name: this block contains tasks related to piedpiper_faas
+  block:
+
+    - name: ensures latest versions of pied piper faas repos have been git cloned (not idempotent)
+      git:
+        repo: "https://github.com/{{ item.org_name }}/{{ item.name }}.git"
+        dest: "{{ pidev_user.homedir }}/{{ item.org_name }}/{{ item.name }}/"
+        clone: "yes"
+        force: "yes"
+      with_items:
+        - "{{ pidev_piedpiper_faas }}"
+      become: true
+      become_user: "{{ pidev_user.name }}"
+      become_method: "su"
+
+    - name: ensures latest versions of each faas is deployed (not idempotent)
+      shell: "faas-cli build && faas-cli deploy"
+      args:
+        chdir: "{{ pidev_user.homedir }}/{{ item.org_name }}/{{ item.name }}/"
+      with_items:
+        - "{{ pidev_piedpiper_faas }}"
+      become: true
+      become_user: "{{ pidev_user.name }}"
+      become_method: "su"
+
+  tags:
+    - piedpiper_faas

@@ -1,0 +1,70 @@
+---
+- name: parses tags and conditionally includes blocks of tasks from inside each included tasks file (ubuntu1804/dockerswarm+openfaas)
+  include: "{{ tasks }}.yml"
+  loop:
+    - facts
+    - user
+    - bashrc
+    - python_packages
+    - repos
+    - apt_packages
+    - daemons
+    - ufw
+    - firewalld
+    - git
+    - docker_user
+    - docker_compose
+    - docker_images
+    - openfaas
+    - piedpiper_faas
+    - piedpiper_cli
+  loop_control:
+    loop_var: "tasks"
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_version == "18.04"
+    - pidev_env_nickname == "ubuntu1804/dockerswarm+openfaas"
+
+- name: parses tags and conditionally includes blocks of tasks from inside each included tasks file (centos7/minishift)
+  include: "{{ tasks }}.yml"
+  loop:
+    - facts
+    - user
+    - bashrc
+    - python_packages
+    - yum_packages
+    - copr_packages
+    - daemons
+    - git
+    - minishift
+  loop_control:
+    loop_var: "tasks"
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "7"
+    - pidev_env_nickname == "centos7/minishift"
+
+- name: parses tags and conditionally includes blocks of tasks from inside each included tasks file (ubuntu1804/kind+ofc)
+  include: "{{ tasks }}.yml"
+  loop:
+    - facts
+    - user
+    - bashrc
+    - python_packages
+    - repos
+    - apt_packages
+    - daemons
+    - git
+    - docker_user
+    - docker_compose
+    - docker_images
+    - piedpiper_faas
+    - piedpiper_cli
+  loop_control:
+    loop_var: "tasks"
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_version == "18.04"
+    - pidev_env_nickname == "ubuntu1804/kind+ofc"
+
+...  

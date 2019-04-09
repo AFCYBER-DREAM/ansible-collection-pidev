@@ -1,0 +1,39 @@
+---
+pidev_sudogroup: "wheel"
+
+pidev_daemons:
+  - libvirtd
+
+pidev_bashrc_extensions:
+  - localbins
+  - scl
+  - oc_env
+
+pidev_packages:
+ # misc requirements
+  - bash-completion
+  - tree
+  - vim
+  - git
+  - nmap
+  - htop
+  - clusterssh
+  - tmux
+  - screen
+  - jq
+  - yum-utils
+  - gcc
+  - curl
+  - bridge-utils
+  - make
+  - libvirt
+  - qemu-kvm
+  - golang
+  - wget
+  - yum-plugin-copr
+
+pidev_copr:
+  - org_name: "@ansible-service-broker"
+    name: "ansible-service-broker-latest"
+    packages:
+      - apb

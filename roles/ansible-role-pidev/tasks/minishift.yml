@@ -1,0 +1,153 @@
+---
+- name: this block contains tasks related to minishift
+  block:
+
+    - name: ensure directory is in place to store minishift/minishift installation files
+      file:
+        dest: "{{ pidev_user.homedir }}/.install/minishift/minishift"
+        state: "directory"
+      vars:
+        ansible_python_interpreter: "/usr/bin/python2.7"
+      become: true
+      become_user: "{{ pidev_user.name }}"
+      become_method: "su"
+
+    - name: get latest release metadata of minishift/minishift via github rest api
+      get_url:
+        url: "https://api.github.com/repos/minishift/minishift/releases/latest"
+        dest: "{{ pidev_user.homedir }}/.install/minishift/minishift/latest_release_metadata.json"
+      vars:
+        ansible_python_interpreter: "/usr/bin/python2.7"
+      become: "no"
+      register: minishift_metadata
+      become: true
+      become_user: "{{ pidev_user.name }}"
+      become_method: "su"
+    
+    - name: get asset url for latest minishift/minishift release
+      script: 'files/download_github_release_assets.sh minishift minishift "-linux-amd64.tgz"'
+      changed_when: false
+      register: minishift_minishift_url
+      become: true
+      become_user: "{{ pidev_user.name }}"
+      become_method: "su"
+    
+    - name: print parsed minishift/minishift urls
+      debug:
+        var: minishift_minishift_url
+      changed_when: false
+
+    - name: ensure latest release of minishift/minishift is installed from minishift/minishift
+      get_url:
+        url: "{{ minishift_minishift_url.stdout_lines[0] }}"
+        dest: "{{ pidev_user.homedir }}/.install/minishift/minishift/minishift-latest.tgz"
+      vars:
+        ansible_python_interpreter: "/usr/bin/python2.7"
+      register: latest_minishift_release
+      become: true
+      become_user: "{{ pidev_user.name }}"
+      become_method: "su"
+    
+    - name: unarchive minishift/minishift in ~/.install directory
+      unarchive:
+        src: "{{ pidev_user.homedir }}/.install/minishift/minishift/minishift-latest.tgz"
+        dest: "{{ pidev_user.homedir }}/.install/minishift/minishift"
+        mode: 0755
+      register: minishift_unarchive
+      when: latest_minishift_release.changed
+      become: true
+      become_user: "{{ pidev_user.name }}"
+      become_method: "su"
+    
+    - name: ensure minishift/minishift is installed in path
+      copy:
+        src: "{{ item }}"
+        dest: "/usr/local/bin/minishift"
+        remote_src: true
+        owner: "root"
+        group: "root"
+        mode: "0755"
+      loop: "{{ query('lines', 'ls {{ pidev_user.homedir }}/.install/minishift/minishift/*/minishift') }}"
+      vars:
+        ansible_python_interpreter: "/usr/bin/python2.7"
+
+    - name: ensure docker machine driver for kvm is installed
+      get_url:
+        url: "https://github.com/dhiltgen/docker-machine-kvm/releases/download/v0.10.0/docker-machine-driver-kvm-centos7"
+        dest: "/usr/local/bin/docker-machine-driver-kvm"
+        mode: "0755"
+      vars:
+        ansible_python_interpreter: "/usr/bin/python2.7"
+    
+    - name: ensure pied piper development user is added to libvirt
+      user:
+        name: "{{ pidev_user.name }}"
+        state: "present"
+        groups:
+          - "libvirt"
+        append: true
+
+    - name: ensure shell is aware of new group
+      shell: "newgrp libvirt"
+      changed_when: false
+
+    - name: ensuring minishift tmux session is started
+      shell: tmux new -d -s minishift;
+      args:
+        chdir: "{{ pidev_user.homedir }}"
+      register: tmux_session
+      changed_when: tmux_session.rc == 0
+      failed_when:
+        - tmux_session.rc != 0
+        - "'duplicate' not in tmux_session.stderr"
+      become: true
+      become_user: "{{ pidev_user.name }}"
+      become_method: "su"
+
+    - name: ensuring minishift vm has been started
+      shell: "tmux send-keys -t minishift.0 'minishift start' ENTER;"
+      args:
+        chdir: "{{ pidev_user.homedir }}"
+        creates: "/run/libvirt/qemu/minishift.pid"
+      register: minishift_start
+      changed_when: "'skipped' not in minishift_start.stdout"
+      register: minishift_start
+      become: true
+      become_user: "{{ pidev_user.name }}"
+      become_method: "su"
+
+    - name: waiting for minishift vm to start (this task skipped if vm already started)
+      wait_for:
+        path: "/run/libvirt/qemu/minishift.pid"
+      when: "'skipped' not in minishift_start.stdout"
+
+    - name: minishift vm started; monitor tmux terminal for oc cluster status and login info (task skipped if vm already started)
+      debug:
+        msg: "monitor progress with: 'su {{ pidev_user.name }}; tmux attach -t minishift'"
+      when: "'skipped' not in minishift_start.stdout"
+
+    - name: ensuring oc cluster is running...
+      shell: "minishift status"
+      register: cluster_status
+      changed_when: false
+      delay: 5
+      retries: 60
+      until: "'OpenShift:  Running' in cluster_status.stdout"
+      become: true
+      become_user: "{{ pidev_user.name }}"
+      become_method: "su"
+
+    - name: ensuring oc login command is working...
+      shell: "eval $(minishift oc-env); oc login -u system:admin"
+      register: oc_login
+      changed_when: false
+      delay: 5
+      retries: 60
+      until: "'Logged into' in oc_login.stdout"
+      become: true
+      become_user: "{{ pidev_user.name }}"
+      become_method: "su"
+
+  tags:
+    - minishift
+...

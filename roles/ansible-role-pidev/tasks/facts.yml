@@ -1,0 +1,34 @@
+---
+- name: this block contains tasks related to facts
+  block:
+
+    - name: check if valid pidev env nickname passed before proceeding
+      debug:
+        msg: "Please pass a valid pidev env nickname; exiting."
+      failed_when: true
+      when:
+        - (pidev_env_nickname != "ubuntu1804/dockerswarm+openfaas" and pidev_env_nickname != "centos7/minishift" and pidev_env_nickname != "ubuntu1804/kind+ofc")
+          
+    - name: if pidev env nickname is ubuntu1804/dockerswarm+openfaas, set facts from defaults/ubuntu1804/dockerswarm+openfaas.yml
+      include_vars: "defaults/ubuntu1804/dockerswarm+openfaas.yml"
+      when:
+        - ansible_distribution == "Ubuntu"
+        - ansible_distribution_version == "18.04"
+        - pidev_env_nickname == "ubuntu1804/dockerswarm+openfaas"
+
+    - name: if pidev env nickname is centos7/minishift, set facts from defaults/centos7/minishift.yml
+      include_vars: "defaults/centos7/minishift.yml"
+      when:
+        - ansible_distribution == "CentOS"
+        - ansible_distribution_major_version == "7"
+        - pidev_env_nickname == "centos7/minishift"
+
+    - name: if pidev env nickname type is ubuntu1804/kind+ofc, set facts from defaults/ubuntu1804/kind+ofc.yml
+      include_vars: "defaults/ubuntu1804/kind+ofc.yml"
+      when:
+        - ansible_distribution == "Ubuntu"
+        - ansible_distribution_version == "18.04"
+        - pidev_env_nickname == "ubuntu1804/kind+ofc"
+
+  tags:
+    - facts

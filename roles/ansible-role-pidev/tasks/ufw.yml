@@ -1,0 +1,14 @@
+---
+- name: this block contains tasks related to ufw
+  block:
+
+    - name: ensure useless firewall (ufw) is disabled and masked
+      systemd:
+        name: "ufw"
+        state: "stopped"
+        enabled: "no"
+        masked: "yes"
+
+  tags:
+    - ufe
+...    

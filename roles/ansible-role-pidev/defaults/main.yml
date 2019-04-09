@@ -1,0 +1,30 @@
+---
+pidev_user:
+  name: "pidev"
+  homedir: "/home/pidev"
+
+pidev_python_pkgs:
+  - name: pip
+  - name: docker
+  - name: ansible
+    version: 2.7
+
+pidev_docker_images:
+  - name: alpine
+    tag: latest
+  - name: ubuntu
+    tag: 18.04
+
+pidev_piedpiper_cli:
+  - name: piedpiper-picli
+    org_name: afcyber-dream 
+
+pidev_piedpiper_faas:
+  - name: piedpiper-validator-faas
+    org_name: afcyber-dream 
+  - name: piedpiper-cpplint-faas
+    org_name: afcyber-dream 
+  - name: piedpiper-flake8-faas
+    org_name: afcyber-dream 
+  - name: piedpiper-pylint-faas
+    org_name: afcyber-dream 

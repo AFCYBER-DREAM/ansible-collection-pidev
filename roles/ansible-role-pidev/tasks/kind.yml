@@ -1,0 +1,9 @@
+---
+- name: this block contains tasks related to kind
+  block:
+
+    - name: ensures latest version of kind is installed
+      shell: "go get -u sigs.k8s.io/kind && kind create cluster"
+
+  tags:
+    - kind

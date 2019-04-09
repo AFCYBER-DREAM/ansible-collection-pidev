@@ -1,0 +1,12 @@
+---
+- name: this block contains tasks related to git
+  block:
+
+    - name: ensure git is configured at system-level
+      git_config:
+        name: "core.editor"
+        value: "vim"
+        scope: "system"
+
+  tags:
+    - git

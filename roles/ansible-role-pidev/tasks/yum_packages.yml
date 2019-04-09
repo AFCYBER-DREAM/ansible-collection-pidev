@@ -1,0 +1,21 @@
+---
+- name: this block contains tasks related to yum_packages
+  block:
+
+
+    - name: ensure all required  system packages are installed
+      yum:
+        name: "{{ pidev_packages }}"
+        state: "present"
+      vars:
+        ansible_python_interpreter: "/usr/bin/python2.7"
+        
+    - name: ensure currently installed system packages are latest
+      yum:
+        name: '*'
+        state: "latest"
+      vars:
+        ansible_python_interpreter: "/usr/bin/python2.7"
+        
+  tags:
+    - yum_packages

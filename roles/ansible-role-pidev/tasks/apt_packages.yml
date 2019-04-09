@@ -1,0 +1,24 @@
+---
+- name: this block contains tasks related to apt_packages
+  block:
+
+    - name: ensure apt cache is up to date (not idempotent)
+      apt:
+        update_cache: "yes"
+    
+    - name: ensure aptitude is installed and latest
+      apt:
+        name: "aptitude"
+        state: "latest"
+    
+    - name: ensure all installed system packages are latest
+      apt:
+        upgrade: "yes"
+    
+    - name: ensure system packages are installed and latest
+      apt:
+        name: "{{ pidev_packages }}"
+        state: "latest"
+        
+  tags:
+    - apt_packages

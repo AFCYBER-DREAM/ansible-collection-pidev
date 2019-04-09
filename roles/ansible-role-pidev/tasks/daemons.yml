@@ -1,0 +1,16 @@
+---
+- name: this block contains tasks related to daemons
+  block:
+
+    - name: ensure required daemons are started and enabled on boot
+      systemd:
+        name: "{{ item }}"
+        state: "started"
+        enabled: "yes"
+        masked: "no"
+      with_items:
+       - "{{ pidev_daemons }}"
+
+  tags:
+    - daemons
+...

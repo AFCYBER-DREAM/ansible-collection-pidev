@@ -1,0 +1,19 @@
+---
+- name: this block contains tasks related to repos
+  block:
+
+    - name: ensure required repo gpg keys are installed
+      apt_key:
+        url: "{{ item }}"
+      with_items:
+        - "https://download.docker.com/linux/ubuntu/gpg"
+    
+    - name: ensure required repositories are installed
+      apt_repository:
+        repo: "{{ item }}"
+      with_items:
+        - "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+
+  tags:
+    - repos
+...
