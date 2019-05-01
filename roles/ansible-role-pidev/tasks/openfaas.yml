@@ -74,9 +74,6 @@
       docker_swarm:
         state: "present"
         advertise_addr: "{{ icanhazip.stdout }}"
-      # become: true
-      # become_user: "{{ pidev_user.name }}"
-      # become_method: "su"
       register: swarm_init
 
     - name: ensure latest versions of openfaas/faas repo has been git cloned

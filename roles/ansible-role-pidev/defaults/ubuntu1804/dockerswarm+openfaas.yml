@@ -12,6 +12,7 @@ pidev_bashrc_extensions:
 pidev_packages:
  # misc requirements
   - python3-pip
+  - python3-distutils
   - bash-completion
   - tree
   - vim
