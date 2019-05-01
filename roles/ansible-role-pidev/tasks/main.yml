@@ -5,9 +5,9 @@
     - facts
     - user
     - bashrc
-    - python_packages
     - repos
     - apt_packages
+    - python_packages
     - daemons
     - ufw
     - firewalld
@@ -31,8 +31,8 @@
     - facts
     - user
     - bashrc
-    - python_packages
     - yum_packages
+    - python_packages
     - copr_packages
     - daemons
     - git
@@ -50,9 +50,9 @@
     - facts
     - user
     - bashrc
-    - python_packages
     - repos
     - apt_packages
+    - python_packages
     - daemons
     - git
     - docker_user
@@ -67,4 +67,4 @@
     - ansible_distribution_version == "18.04"
     - pidev_env_nickname == "ubuntu1804/kind+ofc"
 
-...  
+...

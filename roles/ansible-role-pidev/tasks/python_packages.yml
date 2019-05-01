@@ -2,16 +2,17 @@
 - name: this block contains tasks related to python_packages
   block:
 
-    - name: ensure user pip packages are installed and up-to-date
+    - name: ensure user pip3 packages are installed and up-to-date
       pip:
+        executable: "pip3"
         name: "{{ item.name }}"
         version: "{{ item.version|default('latest') }}"
-        extra_args: "--user"
+        # extra_args: "--user"
       with_items:
         - "{{ pidev_python_pkgs }}"
-      become: true
-      become_user: "{{ pidev_user.name }}"
-      become_method: "su"
+      # become: true
+      # become_user: "{{ pidev_user.name }}"
+      # become_method: "su"
 
   tags:
     - python_packages

@@ -5,28 +5,28 @@
       shell: "firewall-cmd --zone=internal --list-interfaces"
       changed_when: false
       register: internal_interfaces
-    
+
     - name: get list of all enabled services on firewall internal zone
       shell: "firewall-cmd --zone=internal --list-services"
       changed_when: false
       register: get_fw_internal_services
-    
+
     - name: get list of all enabled ports on firewall internal zone
       shell: "firewall-cmd --zone=internal --list-ports"
       changed_when: false
       register: get_fw_internal_ports
-    
+
     - name: get list of all enabled ports on firewall public zone
       shell: "firewall-cmd --list-ports"
       changed_when: false
       register: get_fw_default_ports
-    
+
   # - name: ensure required services enabled on internal firewall zone
   #   shell: "firewall-cmd --permanent --zone=internal --add-service={{ item }}"
   #   when: item not in get_fw_internal_services.stdout
   #   with_items:
   #   notify: reload firewalld
-    
+
     - name: ensure required ports enabled on internal firewall zone
       shell: "firewall-cmd --permanent --zone=internal --add-port={{ item }}"
       when: item not in get_fw_internal_ports.stdout
@@ -41,13 +41,13 @@
       notify:
         - reload firewalld
         - restart docker
-    
+
   # - name: ensure required services enabled on default firewall zone
   #   shell: "firewall-cmd --permanent --zone=internal --add-service={{ item }}"
   #   when: item not in get_fw_internal_services.stdout
   #   with_items:
   #   notify: reload firewalld
-    
+
     - name: ensure required ports enabled on default firewall zone
       shell: "firewall-cmd --permanent --add-port={{ item }}"
       when: item not in get_fw_default_ports.stdout
@@ -62,7 +62,7 @@
       notify:
         - reload firewalld
         - restart docker
-    
+
     - meta: flush_handlers
 
     - name: determine public ip address of node
@@ -74,9 +74,9 @@
       docker_swarm:
         state: "present"
         advertise_addr: "{{ icanhazip.stdout }}"
-      become: true
-      become_user: "{{ pidev_user.name }}"
-      become_method: "su"
+      # become: true
+      # become_user: "{{ pidev_user.name }}"
+      # become_method: "su"
       register: swarm_init
 
     - name: ensure latest versions of openfaas/faas repo has been git cloned
