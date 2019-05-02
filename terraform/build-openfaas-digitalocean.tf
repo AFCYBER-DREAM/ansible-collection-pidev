@@ -58,6 +58,10 @@ resource "null_resource" "rerun" {
 }
 
 output "IPAddress" {
-    # Get the IPv4 addresses
-    value = "${digitalocean_droplet.openfaas.ipv4_address}"
+  # Get the IPv4 addresses
+  value = "${digitalocean_droplet.openfaas.ipv4_address}"
+}
+
+output "OpenFaas_URI" {
+  value = "http://${digitalocean_droplet.openfaas.ipv4_address}:8080/ui/"
 }
