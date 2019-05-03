@@ -3,6 +3,8 @@
 
 variable "do_token" {}
 variable "do_keys" { default = [] }
+variable "user" { default = "somedude" }
+variable "run_provisioner" { default = true }
 
 # Configure the DigitalOcean Provider
 # set do_token = "your api acces token" in terrafrom.tfvars
@@ -21,7 +23,7 @@ resource "digitalocean_droplet" "openfaas" {
 }
 
 resource "digitalocean_project" "openfaas-dev" {
-  name        = "openfaas-dev"
+  name        = "openfaas-dev-${var.user}"
   description = "A project to hold temporary openfaas dev resources."
   purpose     = "Development Support"
   environment = "Development"
@@ -29,7 +31,9 @@ resource "digitalocean_project" "openfaas-dev" {
 }
 
 # Rerun provisioners on clean resources with null_resource
-resource "null_resource" "rerun" {
+resource "null_resource" "ansible_config" {
+  count = "${var.run_provisioner ? 1 : 0}"
+
   triggers {
     rerun = "${uuid()}"
   }
@@ -64,4 +68,9 @@ output "IPAddress" {
 
 output "OpenFaas_URI" {
   value = "http://${digitalocean_droplet.openfaas.ipv4_address}:8080/ui/"
+  description = "OpenFaas Service URI"
+  depends_on = [
+    # Only output the openfaas info if the ansible configs ran successfully
+    "null_resource.ansible_config",
+  ]
 }
