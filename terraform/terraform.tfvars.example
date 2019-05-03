@@ -1,2 +1,4 @@
+# user = "your_name"
+run_provisioner = true
 do_token = "do_token_here"
 do_keys = ["added_ssh_key_hashes", "another_ssh_key_hash"]
