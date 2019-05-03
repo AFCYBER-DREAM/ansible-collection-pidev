@@ -36,10 +36,9 @@ case $2 in
     ;;
 esac
 
-# bootstrap pidev env
 if [[ ${devenv_name} =~ ubuntu1804/* ]]; then
   apt-get update -y \
-  && apt-get install -y curl git python-dev gcc python3-distutils;
+  && apt-get install -y python3-pip;
 elif [[ ${devenv_name} =~ centos7/* ]]; then
   yum update -y \
   && yum install -y epel-release \
@@ -52,14 +51,11 @@ else
   exit 1;
 fi
 
-which pip2 || curl -s https://bootstrap.pypa.io/get-pip.py | python2.7;
-pip2 install -U pip;
-which pip3 || curl -s https://bootstrap.pypa.io/get-pip.py | python3.6;
-pip3 install -U pip ansible==2.7 docker;
+pip3 install -U ansible==2.7 docker;
 
 repo_status_code="$(read _ status _ < <(curl -ksI https://github.com/$1); echo ${status})";
 if [[ "${repo_status_code}" == "200" ]]; then
-  ansible-pull -vv -U "https://github.com/$1.git" configure.yml -e "pidev_env_nickname=${devenv_name}";
+  echo ansible-pull -vv -U "https://github.com/$1.git" configure.yml -e "pidev_env_nickname=${devenv_name}" -e ansible_python_interpreter=/usr/bin/python3;
 else
   echo "Invalid repository ($1) specified; exiting..."
   exit 1;
