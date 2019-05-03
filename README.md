@@ -11,32 +11,70 @@ This repository contains the code required to setup various development/test env
 The first step is to decide whether you would like to use the code, as is, in the afcyber-dream/ansible-collection-pidev repo,
 or alternately, fork the repo into your own organization. Currently, only www.github.com repositories are supported.
 
-#### Environment Selection
+### Environment Selection
 
-The next step is to decide which development environment you require. 
+The next step is to decide which development environment you require.
 This repository can be used to build several different development environments:
 
-##### centos7/minishift
+#### centos7/minishift
 
 This environment is used to test application integration with `minishift` and `apb`.
 
-##### ubuntu1804/dockerswarm+openfaas
+#### ubuntu1804/dockerswarm+openfaas
 
 This environment is used to test faas integration with `openfaas` installed atop `docker swarm`.
 
-##### ubuntu1804/kind+ofc
+#### ubuntu1804/kind+ofc
 
 Work in progress !
 
 This environment is used to test faas integration with `openfaas cloud` installed atop `kind`.
 
-#### Environment Provisioning
+### Environment Provisioning
+
+Two supported options push with terraform or pull with a bootstra.sh script.
+
+push is good for dev or managing infra with terraform, pull is good for CI/CD and docker image builds etc.
+
+#### Terraform or "Push" Method
+
+Current supported infra deploys by terraform
+ - ubuntu1804/dockerswarm+openfaas
+
+You can use Terraform to build a dev faas infra and push local developed faas functions.
+
+##### Initial Deployment with Terraform to Digitial Ocean cloud
+
+###### Configure Terraform
+Configure your terraform.tfvars file with your key hash, username and digital ocean API key. See terraform/terraform.tfvars.example
+
+###### Run Terraform
+From `terraform/` run `terraform apply`
+
+##### Deploy faas functions from a local directory
+
+Define your local faas function dir in `roles/ansible-role-pidev/defaults/main.yml`
+```
+pidev_piedpiper_faas:
+...
+  - name: piedpiper-gman-faas
+    org_name: afcyber-dream
+    method: copy
+    src: "{{ lookup('env','HOME') }}/piedpiper-gman-faas/"
+...
+```
+
+##### Run Terraform
+
+`terraform apply -var tags=piedpiper_faas`
+
+#### Manual deploy or "Pull" Method
 
 Prior to using the code in your selected repository, a fresh/unmodified operating system is required.
-The distro and version must match the one specified for the environment you wish to provision. 
-The environment can either be a virtual machine or dedicated machine, hosted anywhere internet accessible. 
+The distro and version must match the one specified for the environment you wish to provision.
+The environment can either be a virtual machine or dedicated machine, hosted anywhere internet accessible.
 
-The "centos7/minishift" environment's operating system and host operating system (if a vm) must support nested virtualization. 
+The "centos7/minishift" environment's operating system and host operating system (if a vm) must support nested virtualization.
 DigitalOcean currently supports this in NYC1 and NYC3, but not in any other of it's datacenters.
 
 #### Environment Configuration
@@ -93,7 +131,7 @@ alias minishift_proxy="ssh -D 6969 root@${server_ip}"; minishift_proxy
 
 # Go into your FoxyProxy settings and set your traffic to proxy through 127.0.0.1:6969 (or whatever port you connected with above).
 
-# You should now be able to access minishift at the 192.168.X.X address it is bound to on the virbr network on the server. 
+# You should now be able to access minishift at the 192.168.X.X address it is bound to on the virbr network on the server.
 # If you don't know what address this is or the login information, run this to display it:
 minishift stop; minishift start;
 
@@ -129,7 +167,6 @@ firefox https://192.168.X.X:8443/console
 The code in this repository does not require any modifications in order to work as a quick-start instance; however, those familiar with `ansible` may wish to modify it.
 This can be done by adding a "vars_file" to the `configure.yml` playbook and overriding variables defined in the `defaults/` directory of the role. Keep in mind, overriding any single variable dictionary completely overrides the contents of that single variable dictionary, as it appears in the `defaults/` directory; it does NOT merge your custom dictionary with that one.
 
-The default variables are split between `defaults/main.yml` and `defaults/${env}.yml`. Please review these two locations to determine the variable dictionary structures before overriding the dictionary that is required to make your desired configuration change. You can see which environments use which variable dictionaries by reviewing the role's `tasks/main.yml` entry. This file contains a list of each tasks block called to build each environment. 
+The default variables are split between `defaults/main.yml` and `defaults/${env}.yml`. Please review these two locations to determine the variable dictionary structures before overriding the dictionary that is required to make your desired configuration change. You can see which environments use which variable dictionaries by reviewing the role's `tasks/main.yml` entry. This file contains a list of each tasks block called to build each environment.
 
 The tasks blocks are located in `tasks/${tasks_block}.yml` and are divided in a way that lets groupings of tasks be reused by multiple different types of environments. Some tasks blocks use the same variables, regardless of the underlying environment, while other tasks blocks may use different variables, depending on the underlying environment. See each individual tasks block file to determine which one is the case for each task.
-
