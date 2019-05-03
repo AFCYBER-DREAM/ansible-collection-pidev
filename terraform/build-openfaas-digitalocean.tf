@@ -3,6 +3,7 @@
 
 variable "do_token" {}
 variable "do_keys" { default = [] }
+variable "tags" { }
 
 # Configure the DigitalOcean Provider
 # set do_token = "your api acces token" in terrafrom.tfvars
@@ -45,6 +46,7 @@ resource "null_resource" "rerun" {
       playbook = {
         file_path = "../configure.yml"
         roles_path = ["../roles"]
+        tags = [ "${var.tags}" ]
       }
       # shared attributes
       enabled = true
