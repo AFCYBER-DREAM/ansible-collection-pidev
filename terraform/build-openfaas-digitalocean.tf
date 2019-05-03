@@ -50,7 +50,7 @@ resource "null_resource" "rerun" {
       enabled = true
 
       extra_vars = {
-        ansible_python_interpreter = "/usr/bin/python3"
+        ansible_python_interpreter = "python3"
         pidev_env_nickname = "ubuntu1804/dockerswarm+openfaas"
       }
     }

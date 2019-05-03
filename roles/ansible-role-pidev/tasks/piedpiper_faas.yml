@@ -16,12 +16,14 @@
       become_user: "{{ pidev_user.name }}"
       become_method: "su"
 
-    - name: copy any local dev faas repo to remote system for install
-      copy:
+    - name: sync any local dev faas repo to remote system for install
+      synchronize:
         src: "{{ item.src }}"
+        archive: "yes"
+        delete: "yes"
         dest: "{{ pidev_user.homedir }}/{{ item.org_name }}/{{ item.name }}/"
-        owner: "{{ pidev_user.name }}"
-        group: "{{ pidev_user.name }}"
+        owner: "no"
+        group: "no"
 
       with_items:
         - "{{ pidev_piedpiper_faas }}"
