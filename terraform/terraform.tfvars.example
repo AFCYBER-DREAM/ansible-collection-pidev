@@ -1,4 +1,4 @@
-user = "example_user"
+# user = "your_name"
 run_provisioner = true
 do_token = "do_token_here"
 do_keys = ["00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00", "another_ssh_key_hash"]
