@@ -11,9 +11,23 @@
         force: "yes"
       with_items:
         - "{{ pidev_piedpiper_faas }}"
+      when: item.method | default("git") == "git"
       become: true
       become_user: "{{ pidev_user.name }}"
       become_method: "su"
+
+    - name: sync any local dev faas repo to remote system for install
+      synchronize:
+        src: "{{ item.src }}"
+        archive: "yes"
+        delete: "yes"
+        dest: "{{ pidev_user.homedir }}/{{ item.org_name }}/{{ item.name }}/"
+        owner: "no"
+        group: "no"
+
+      with_items:
+        - "{{ pidev_piedpiper_faas }}"
+      when: item.method | default("git") == "copy"
 
     - name: ensures latest versions of each faas is deployed (not idempotent)
       shell: "faas-cli build && faas-cli deploy"
