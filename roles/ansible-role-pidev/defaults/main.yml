@@ -30,3 +30,7 @@ pidev_piedpiper_faas:
   - name: piedpiper-pylint-faas
     org_name: afcyber-dream
     version: master
+  - name: piedpiper-gman-faas
+    org_name: afcyber-dream
+    method: copy
+    src: "{{ lookup('env','HOME') }}/Projects/piedpiper-gman-faas/"
