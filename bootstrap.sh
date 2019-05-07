@@ -37,25 +37,27 @@ case $2 in
 esac
 
 if [[ ${devenv_name} =~ ubuntu1804/* ]]; then
-  apt-get update -y \
-  && apt-get install -y python3-pip;
+  apt-get install -y python3-pip;
+  _python=$(which python3)
+  _pip=pip3
 elif [[ ${devenv_name} =~ centos7/* ]]; then
-  yum update -y \
-  && yum install -y epel-release \
+
+  yum install -y epel-release \
   && yum install -y centos-release-scl \
-  && yum install -y curl git python-devel gcc;
-  yum install -y rh-python36 rh-python36-python-devel;
-  source /opt/rh/rh-python36/enable;
+  && yum install -y git python27-python-pip \
+  && yum install -y rh-python36 rh-python36-python-devel rh-python36-python-pip;
+  # source /opt/rh/rh-python36/enable;
+  _python=$(which python2.7)
+  $_pip=pip
 else
   echo "Unsupported pidev environment nickname; exiting..."
   exit 1;
 fi
 
-pip3 install -U ansible==2.7 docker;
-
+$_pip install -U ansible==2.7 docker;
 repo_status_code="$(read _ status _ < <(curl -ksI https://github.com/$1); echo ${status})";
 if [[ "${repo_status_code}" == "200" ]]; then
-  echo ansible-pull -vv -U "https://github.com/$1.git" configure.yml -e "pidev_env_nickname=${devenv_name}" -e ansible_python_interpreter=/usr/bin/python3;
+  ansible-pull -vv -U "https://github.com/$1.git" configure.yml -e "pidev_env_nickname=${devenv_name}" -e ansible_python_interpreter=${_python};
 else
   echo "Invalid repository ($1) specified; exiting..."
   exit 1;
