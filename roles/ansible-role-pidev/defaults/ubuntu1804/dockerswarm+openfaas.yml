@@ -11,6 +11,8 @@ pidev_bashrc_extensions:
 
 pidev_packages:
  # misc requirements
+  - python3-pip
+  - python3-distutils
   - bash-completion
   - tree
   - vim
@@ -32,11 +34,10 @@ pidev_packages:
   - curl
   - gnupg-agent
   - bridge-utils
-  - linux-headers-{{ lookup('pipe','uname -r') }}
+  - linux-headers-{{ ansible_kernel }}
   - make
   - snapd
  # docker requirements
   - docker-ce
   - docker-ce-cli
   - containerd.io
-

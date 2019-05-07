@@ -24,7 +24,16 @@
         dest: "{{ pidev_user.homedir }}/{{ item.org_name }}/{{ item.name }}/"
         owner: "no"
         group: "no"
+      with_items:
+        - "{{ pidev_piedpiper_faas }}"
+      when: item.method | default("git") == "copy"
 
+    - name: reset local dev faas perms
+      file:
+        path: "{{ pidev_user.homedir }}/{{ item.org_name }}/{{ item.name }}/"
+        owner: "{{ pidev_user.name }}"
+        group: "{{ pidev_user.name }}"
+        recurse: "yes"
       with_items:
         - "{{ pidev_piedpiper_faas }}"
       when: item.method | default("git") == "copy"

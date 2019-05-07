@@ -3,7 +3,7 @@
 
 variable "do_token" {}
 variable "do_keys" { default = [] }
-variable "tags" { }
+variable "tags" { default = "" }
 variable "user" { default = "somedude" }
 variable "run_provisioner" { default = true }
 
@@ -50,7 +50,7 @@ resource "null_resource" "ansible_config" {
       playbook = {
         file_path = "../configure.yml"
         roles_path = ["../roles"]
-        tags = [ "${var.tags}" ]
+        # tags = [ "${var.tags}" ]
       }
       # shared attributes
       enabled = true

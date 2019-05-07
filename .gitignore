@@ -2,3 +2,4 @@ configure.retry
 terraform/.terraform/*
 *.tfstate*
 terraform/terraform.tfvars
+.terraform/*

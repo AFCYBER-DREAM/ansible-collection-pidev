@@ -4,10 +4,7 @@ pidev_user:
   homedir: "/home/pidev"
 
 pidev_python_pkgs:
-  - name: pip
   - name: docker
-  - name: ansible
-    version: 2.7
 
 pidev_docker_images:
   - name: alpine
@@ -17,19 +14,23 @@ pidev_docker_images:
 
 pidev_piedpiper_cli:
   - name: piedpiper-picli
-    org_name: afcyber-dream 
+    org_name: afcyber-dream
     version: master
 
 pidev_piedpiper_faas:
   - name: piedpiper-validator-faas
-    org_name: afcyber-dream 
+    org_name: afcyber-dream
     version: master
   - name: piedpiper-cpplint-faas
-    org_name: afcyber-dream 
+    org_name: afcyber-dream
     version: master
   - name: piedpiper-flake8-faas
-    org_name: afcyber-dream 
+    org_name: afcyber-dream
     version: master
   - name: piedpiper-pylint-faas
-    org_name: afcyber-dream 
+    org_name: afcyber-dream
     version: master
+  # - name: piedpiper-myfunc-faas
+  #   org_name: afcyber-dream
+  #   method: copy
+  #   src: "{{ lookup('env','HOME') }}/Projects/piedpiper-myfunc-faas/"

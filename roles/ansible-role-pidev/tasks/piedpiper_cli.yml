@@ -16,7 +16,7 @@
       become_method: "su"
 
     - name: ensures latest versions of picli is installed (not idempotent)
-      shell: "pip3 install --user -r requirements.txt && python3 setup.py install"
+      shell: "python3 setup.py install"
       args:
         chdir: "{{ pidev_user.homedir }}/{{ item.org_name }}/{{ item.name }}/"
       with_items:
