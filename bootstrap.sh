@@ -57,7 +57,7 @@ fi
 $_pip install -U ansible==2.7 docker;
 repo_status_code="$(read _ status _ < <(curl -ksI https://github.com/$1); echo ${status})";
 if [[ "${repo_status_code}" == "200" ]]; then
-  ansible-pull -vv -U "https://github.com/$1.git" configure.yml -e "pidev_env_nickname=${devenv_name}" -e ansible_python_interpreter=${_python};
+  ansible-pull -vv  -i localhost, -U "https://github.com/$1.git" configure.yml -e "pidev_env_nickname=${devenv_name}" -e ansible_python_interpreter=${_python};
 else
   echo "Invalid repository ($1) specified; exiting..."
   exit 1;
