@@ -37,7 +37,8 @@ case $2 in
 esac
 
 if [[ ${devenv_name} =~ ubuntu1804/* ]]; then
-  apt-get install -y python3-pip;
+  apt-get update \
+  && apt-get install -y python3-pip;
   _python=$(which python3)
   _pip=pip3
 elif [[ ${devenv_name} =~ centos7/* ]]; then
