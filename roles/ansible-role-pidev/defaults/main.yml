@@ -30,6 +30,9 @@ pidev_piedpiper_faas:
   - name: piedpiper-pylint-faas
     org_name: afcyber-dream
     version: master
+  - name: piedpiper-pybandit-faas
+    org_name: afcyber-dream
+    version: master
   # - name: piedpiper-myfunc-faas
   #   org_name: afcyber-dream
   #   method: copy
