@@ -6,19 +6,15 @@
       apt:
         update_cache: "yes"
     
-    - name: ensure aptitude is installed and latest
+    - name: ensure aptitude is installed
       apt:
         name: "aptitude"
-        state: "latest"
+        state: "present"
     
-    - name: ensure all installed system packages are latest
-      apt:
-        upgrade: "yes"
-    
-    - name: ensure system packages are installed and latest
+    - name: ensure system packages are installed
       apt:
         name: "{{ pidev_packages }}"
-        state: "latest"
+        state: "present"
         
   tags:
     - apt_packages
