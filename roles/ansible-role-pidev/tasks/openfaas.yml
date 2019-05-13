@@ -21,12 +21,6 @@
       changed_when: false
       register: get_fw_default_ports
 
-  # - name: ensure required services enabled on internal firewall zone
-  #   shell: "firewall-cmd --permanent --zone=internal --add-service={{ item }}"
-  #   when: item not in get_fw_internal_services.stdout
-  #   with_items:
-  #   notify: reload firewalld
-
     - name: ensure required ports enabled on internal firewall zone
       shell: "firewall-cmd --permanent --zone=internal --add-port={{ item }}"
       when: item not in get_fw_internal_ports.stdout
@@ -38,15 +32,10 @@
         - "2376/tcp"
         - "2377/tcp"
         - "8080/tcp"
+        - "9000/tcp"
       notify:
         - reload firewalld
         - restart docker
-
-  # - name: ensure required services enabled on default firewall zone
-  #   shell: "firewall-cmd --permanent --zone=internal --add-service={{ item }}"
-  #   when: item not in get_fw_internal_services.stdout
-  #   with_items:
-  #   notify: reload firewalld
 
     - name: ensure required ports enabled on default firewall zone
       shell: "firewall-cmd --permanent --add-port={{ item }}"
@@ -59,6 +48,7 @@
         - "2376/tcp"
         - "2377/tcp"
         - "8080/tcp"
+        - "9000/tcp"
       notify:
         - reload firewalld
         - restart docker
@@ -85,6 +75,50 @@
       become: true
       become_user: "{{ pidev_user.name }}"
       become_method: "su"
+
+    - name: ensure manage_docker_secrets script is in path
+      copy:
+        src: "files/manage_docker_secrets.sh"
+        dest: "/usr/local/bin/manage_docker_secrets"
+        owner: "root"
+        group: "root"
+        mode: "0755"
+
+    - name: ensure minio docker secrets are generated and stored
+      shell: "manage_docker_secrets add {{ item }}"
+      args:
+        chdir: "{{ pidev_user.homedir }}"
+        executable: "/bin/bash"
+        creates: "{{ pidev_user.homedir }}/{{ item }}.docker_secret.txt"
+      become: true
+      become_user: "{{ pidev_user.name }}"
+      become_method: "sudo"
+      loop:
+        - access_key
+        - secret_key
+
+    - name: ensure minio settings are referenced in openfaas/faas docker-compose.yml file
+      yedit:
+        src: "{{ pidev_user.homedir }}/openfaas/faas/docker-compose.yml"
+        key: "{{ item.key }}"
+        value: "{{ item.value }}"
+      become: true
+      become_user: "{{ pidev_user.name }}"
+      become_method: "sudo"
+      loop:
+        - { key: secrets.access_key.external, value: "true" }
+        - { key: secrets.secret_key.external, value: "true" }
+        - { key: services.minio.deploy.restart_policy.delay, value: "10s" }
+        - { key: services.minio.deploy.restart_policy.max_attempts, value: "10" }
+        - { key: services.minio.deploy.restart_policy.window, value: "60s" }
+        - { key: services.minio.hostname, value: "minio" }
+        - { key: services.minio.image, value: "minio/minio:RELEASE.2019-04-23T23-50-36Z" }
+        - { key: services.minio.networks, value: ["functions"] }
+        - { key: services.minio.ports, value: ["9000:9000"] }
+        - { key: services.minio.command, value: "server /export" }
+        - { key: services.minio.secrets, value: ["secret_key", "access_key"] }
+        - { key: services.minio.volumes, value: ["minio_data:/export"] }
+        - { key: volumes.minio_data.driver, value: "local" }
 
     - name: ensure poc openfaas docker swarm based installation is deployed/updated (not idempotent)
       shell: "./deploy_stack.sh --no-auth"
