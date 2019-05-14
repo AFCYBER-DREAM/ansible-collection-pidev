@@ -120,24 +120,42 @@ DigitalOcean currently supports this in NYC1 and NYC3, but not in any other of i
 
 #### Environment Configuration
 
-After provisioning the instance, login as the `root` user, and run the following commands:
+You are going to be passing zero or more arguments to a bootstrap script in order to build your environment. If you decided to use the Terraform provisioner, this step will have already been performed for you. If you did not use the Terraform provisioner, after provisioning the instance some other way, login as the `root` user, and build/run your bootstrap command like below. First, you'll want to be aware of what options the bootstrap command has. It accepts zero or more option, and has a preset default for each one.
 
 ```
-# the "org" variable should be the name of your Github.com organization
-org="afcyber-dream";
-
-# the "repo" variable should be the name of the repo containing your fork of afcyber-dream/ansible-collection-pidev
-repo="ansible-collection-pidev";
-
-# the "env" variable should be the nickname of the environment you wish to provision
-env="centos7/minishift"
-
-# once you have set these three variables, run this command as `root` (not a sudo user):
-bash <(curl -s https://raw.githubusercontent.com/${org}/${repo}/master/bootstrap.sh) ${org}/${repo} ${env}
+Usage: bootstrap.sh for pidev
+       [-e devenv_name]
+       [-o org_name]
+       [-r repo_name]
+       [-u]
+       [-p]
+       [-v]
+       [-h]
+       
+       Optional Parameter(s):
+       -e:  Specifies development environment.
+            (Default: ubuntu1804/dockerswarm+openfaas)
+       -o:  Sets org/username string of desired Github URL.
+            (Default: afcyber-dream)
+       -r:  Sets repo name string of desired Github URL.
+            (Default: ansible-collection-pidev)
+       -u:  Upgrades system deb/rpm packages on system.
+            (Default: false)
+       -p:  Installs both 2.x and 3.x versions of Python.
+            (Default: false)
+       -v:  Verbose mode; runs ansible commands with -vv.
+            (Default: false)
+       -h:  Prints this help/usage message.
 ```
 
-Running these commands will begin running a `bootstrap.sh` script that will provision your environment based on the `${env}` parameter you passed it.
-After performing the steps neccessary to bootstrap `ansible`, the shell script will call an ansible playbook from the Github ${org}/${repo} you passed it.
+Next, you'll want to build out your bootstrap command and run it. Below is a simple example of building out a command to run against your fork, while upgrading system packages. It is assumed in this example, that the name of your fork matches the name of the upstream repository. It is also assumed that you wish to use the default environment (ubuntu1804/dockerswarm+openfaas).
+
+```
+org="your-org-or-username-here"; bash <(curl -s https://raw.githubusercontent.com/${org}/ansible-collection-pidev/master/bootstrap.sh) -u -o ${org}
+```
+
+Running these commands will begin running a `bootstrap.sh` script that will provision your environment based on the environment requested.
+After performing the steps neccessary to bootstrap `ansible`, the shell script will call an ansible playbook from the Github org/repo combo you passed it.
 Monitor the output of this `ansible-playbook` run to determine when the environment has been fully provisioned. By default, the `pidev` user will be the user designed to use all the appliactions provisioned on the operating system. This user name, (and many other configuration options), can be changed. See the "Customizing Configuration Script" section for more details.
 
 ### Environment Resource Access
