@@ -2,7 +2,7 @@
 - name: this block contains tasks related to piedpiper_faas
   block:
 
-    - name: ensures latest versions of pied piper faas repos have been git cloned (not idempotent)
+    - name: ensures latest versions of function repos have been cloned from SCM
       git:
         repo: "https://github.com/{{ item.org_name }}/{{ item.name }}.git"
         dest: "{{ pidev_user.homedir }}/{{ item.org_name }}/{{ item.name }}/"
@@ -15,8 +15,10 @@
       become: true
       become_user: "{{ pidev_user.name }}"
       become_method: "su"
+      notify:
+        - deploy functions
 
-    - name: sync any local dev faas repo to remote system for install
+    - name: ensures locally developed functions are synced to environment
       synchronize:
         src: "{{ item.src }}"
         archive: "yes"
@@ -27,8 +29,10 @@
       with_items:
         - "{{ pidev_piedpiper_faas }}"
       when: item.method | default("git") == "copy"
+      notify:
+        - deploy functions
 
-    - name: reset local dev faas perms
+    - name: ensures file permissions are set properly on all function repos
       file:
         path: "{{ pidev_user.homedir }}/{{ item.org_name }}/{{ item.name }}/"
         owner: "{{ pidev_user.name }}"
@@ -37,16 +41,6 @@
       with_items:
         - "{{ pidev_piedpiper_faas }}"
       when: item.method | default("git") == "copy"
-
-    - name: ensures latest versions of each faas is deployed (not idempotent)
-      shell: "faas-cli build && faas-cli deploy"
-      args:
-        chdir: "{{ pidev_user.homedir }}/{{ item.org_name }}/{{ item.name }}/"
-      with_items:
-        - "{{ pidev_piedpiper_faas }}"
-      become: true
-      become_user: "{{ pidev_user.name }}"
-      become_method: "su"
 
   tags:
     - piedpiper_faas
