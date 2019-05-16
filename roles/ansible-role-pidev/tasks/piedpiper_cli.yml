@@ -2,7 +2,7 @@
 - name: this block contains tasks related to piedpiper_cli
   block:
 
-    - name: ensures latest versions of pied piper cli has been git cloned (not idempotent)
+    - name: ensures latest versions of pied piper cli has been git cloned
       git:
         repo: "https://github.com/{{ item.org_name }}/{{ item.name }}.git"
         dest: "{{ pidev_user.homedir }}/{{ item.org_name }}/{{ item.name }}/"
@@ -14,13 +14,8 @@
       become: true
       become_user: "{{ pidev_user.name }}"
       become_method: "su"
-
-    - name: ensures latest versions of picli is installed (not idempotent)
-      shell: "python3 setup.py install"
-      args:
-        chdir: "{{ pidev_user.homedir }}/{{ item.org_name }}/{{ item.name }}/"
-      with_items:
-        - "{{ pidev_piedpiper_cli }}"
+      notify:
+        - install picli
 
   tags:
     - piedpiper_cli

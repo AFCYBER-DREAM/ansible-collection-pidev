@@ -57,6 +57,8 @@
 
     - name: determine public ip address of node
       shell: "curl -s ipv4.icanhazip.com"
+      args:
+        warn: false
       register: icanhazip
       changed_when: false
 
@@ -75,6 +77,18 @@
       become: true
       become_user: "{{ pidev_user.name }}"
       become_method: "su"
+      register: clone_openfaas_faas
+
+    - name: ensure docker-compose.yml is in user home
+      copy:
+        src: "{{ pidev_user.homedir}}/openfaas/faas/docker-compose.yml"
+        dest: "{{ pidev_user.homedir }}/docker-compose.yml"
+        owner: "{{ pidev_user.name }}"
+        group: "{{ pidev_user.name }}"
+        mode: "0644"
+      when: clone_openfaas_faas is changed
+      notify:
+        - deploy stack
 
     - name: ensure manage_docker_secrets script is in path
       copy:
@@ -96,10 +110,12 @@
       loop:
         - access_key
         - secret_key
+      notify:
+        - deploy stack
 
     - name: ensure minio settings are referenced in openfaas/faas docker-compose.yml file
       yedit:
-        src: "{{ pidev_user.homedir }}/openfaas/faas/docker-compose.yml"
+        src: "{{ pidev_user.homedir }}/docker-compose.yml"
         key: "{{ item.key }}"
         value: "{{ item.value }}"
       become: true
@@ -119,16 +135,11 @@
         - { key: services.minio.secrets, value: ["secret_key", "access_key"] }
         - { key: services.minio.volumes, value: ["minio_data:/export"] }
         - { key: volumes.minio_data.driver, value: "local" }
+      notify:
+        - deploy stack
 
-    - name: ensure poc openfaas docker swarm based installation is deployed/updated (not idempotent)
-      shell: "./deploy_stack.sh --no-auth"
-      args:
-        chdir: "{{ pidev_user.homedir }}/openfaas/faas/"
-      become: true
-      become_user: "{{ pidev_user.name}}"
-      become_method: "su"
-      register: faas_deploy
-      failed_when: false
+    - name: ensure docker swarm stack is deployed/updated (as required)
+      meta: flush_handlers
 
     - name: check faas-cli version (before upgrade/install attempt)
       shell: "faas-cli version"
@@ -138,6 +149,8 @@
 
     - name: ensure faas-cli is installed and updated
       shell: "curl -sL https://cli.openfaas.com | bash"
+      args:
+        warn: false
       changed_when: false
 
     - name: check faas-cli version (after upgrade/install attempt)
