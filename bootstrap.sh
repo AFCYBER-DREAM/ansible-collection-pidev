@@ -12,6 +12,7 @@ pidevUsage() {
   echo "       [-e devenv_name]"
   echo "       [-o org_name]"
   echo "       [-r repo_name]"
+  echo "       [-b repo_branch]"
   echo "       [-u]"
   echo "       [-p]"
   echo "       [-v]"
@@ -24,6 +25,8 @@ pidevUsage() {
   echo "            (Default: afcyber-dream)"
   echo "       -r:  Sets repo name string of desired Github URL."
   echo "            (Default: ansible-collection-pidev)"
+  echo "       -b: Sets the branch name of the repo."
+  echo "            (Default: master)"
   echo "       -u:  Upgrades system deb/rpm packages on system."
   echo "            (Default: false)"
   echo "       -p:  Installs both 2.x and 3.x versions of Python."
@@ -34,7 +37,7 @@ pidevUsage() {
 }
 
 # Bash-builtin getopts is used to perform parsing, so no long options are used.
-while getopts ":e:o:r:upvh" passed_parameter; do
+while getopts ":e:o:r:b:upvh" passed_parameter; do
  case "${passed_parameter}" in
     e)
       # Sanitizes the devenv string of space or any other undesired characters.
@@ -63,6 +66,15 @@ while getopts ":e:o:r:upvh" passed_parameter; do
         exit 1;
       fi
       ;;
+   b)
+     # Sanitizes the branch name of space or any other undesired characters.
+     requested_repo_branch="${OPTARG}";
+     repo_branch="${requested_repo_branch//[^a-zA-Z0-9_+-]}";
+     if [[ "${requested_repo_branch}" != "${repo_branch}" ]]; then
+       echo "Requested repo_branch contains invalid characters; exiting." 2>&1;
+   	exit 1;
+     fi
+     ;;
     u)
       # Used to toggle on system package upgrades during bootstrap
       upgrade="true";
@@ -165,6 +177,7 @@ if [[ "${repo_status_code}" == "200" ]]; then
     -e "pidev_env_nickname=${devenv_name}" \
     -e "ansible_python_interpreter=${default_python}" \
     -U "https://github.com/${org_name}/${repo_name}.git" \
+	--checkout "${repo_branch:-master}" \
     configure.yml;
 else
   echo "Invalid repository URL; exiting..."
