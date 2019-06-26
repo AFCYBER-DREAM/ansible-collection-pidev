@@ -4,7 +4,7 @@
 
     - name: ensure user pip3 packages are installed and up-to-date
       pip:
-        executable: "pip3"
+        executable: "/usr/bin/pip3"
         name: "{{ item.name }}"
         version: "{{ item.version|default('latest') }}"
       with_items:
