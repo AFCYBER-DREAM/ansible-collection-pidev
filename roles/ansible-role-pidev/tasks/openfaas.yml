@@ -115,7 +115,7 @@
 
     - name: ensure minio settings are referenced in openfaas/faas docker-compose.yml file
       yedit:
-        src: "{{ pidev_user.homedir }}/docker-compose.yml"
+        src: "{{ pidev_user.homedir }}/openfaas/faas/docker-compose.yml"
         key: "{{ item.key }}"
         value: "{{ item.value }}"
       become: true
@@ -135,6 +135,13 @@
         - { key: services.minio.secrets, value: ["secret_key", "access_key"] }
         - { key: services.minio.volumes, value: ["minio_data:/export"] }
         - { key: volumes.minio_data.driver, value: "local" }
+        - { key: services.gman.deploy.restart_policy.delay, value: "10s" }
+        - { key: services.gman.deploy.restart_policy.max_attempts, value: "10" }
+        - { key: services.gman.deploy.restart_policy.window, value: "60s" }
+        - { key: services.gman.hostname, value: "gman" }
+        - { key: services.gman.image, value: "piperci/gman:latest" }
+        - { key: services.gman.networks, value: ["functions"] }
+        - { key: services.gman.ports, value: ["8089:8080"] }
       notify:
         - deploy stack
 
