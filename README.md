@@ -89,6 +89,18 @@ rerun this command to reinitialize your working directory. If you forget, other
 commands will detect it and remind you to do so if necessary.
 ```
 
+###### Run Docker container to run Terraform
+
+If, instead, you want to run Terraform within a container, do the following:
+
+`docker build -t ubuntu1804/pidev-terraform terraform/`
+
+`docker run -v $(pwd):/code -it ubuntu1804/pidev-terraform /bin/bash`
+
+You will now be able to do everything from the mounted /code directory.
+
+You might also need to mount the ssh keys for Digital Ocean by adding `-v [insert-ssh-key-dir]:/.ssh` to the run command
+
 ###### Run Terraform
 From `terraform/` run `terraform apply`
 
