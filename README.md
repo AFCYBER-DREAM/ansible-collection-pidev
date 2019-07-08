@@ -32,7 +32,7 @@ This environment is used to test faas integration with `openfaas cloud` installe
 
 ### Environment Provisioning
 
-Two supported options push with terraform or pull with a bootstra.sh script.
+Two supported options push with terraform or pull with the bootstrap.sh script.
 
 push is good for dev or managing infra with terraform, pull is good for CI/CD and docker image builds etc.
 
