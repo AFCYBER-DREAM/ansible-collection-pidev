@@ -32,7 +32,7 @@ This environment is used to test faas integration with `openfaas cloud` installe
 
 ### Environment Provisioning
 
-Two supported options push with terraform or pull with a bootstra.sh script.
+Two supported options push with terraform or pull with a bootstrap.sh script.
 
 push is good for dev or managing infra with terraform, pull is good for CI/CD and docker image builds etc.
 
@@ -59,6 +59,7 @@ Install the tf ansible plugin
 ```
 -rwxr-xr-x  1 nickshobe  staff  31366360 May  7 14:03 /Users/myusername/.terraform.d/plugins/terraform-provisioner-ansible_v2.2.0
 ```
+
 
 `terraform init`
 
@@ -91,6 +92,16 @@ commands will detect it and remind you to do so if necessary.
 
 ###### Run Terraform
 From `terraform/` run `terraform apply`
+
+###### Run Terraform in Docker Container
+
+Alternatively, you may use the provided docker container from terraform-ansible. In the terraform directory, run the
+following commands instead of `terraform init` and `terraform apply` as noted previously. You will still have to
+configure the configuration files.
+
+`docker run -it --rm -v $PWD/..:$PWD/.. -w $PWD radekg/terraform-ansible:latest init`
+`docker run -it --rm -v $PWD/..:$PWD/.. -w $PWD radekg/terraform-ansible:latest apply`
+
 
 ##### Deploy faas functions from a local directory
 
