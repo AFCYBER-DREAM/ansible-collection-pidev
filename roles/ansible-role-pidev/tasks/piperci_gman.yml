@@ -4,7 +4,7 @@
 
     - name: ensures latest versions of piperci gman has been git cloned
       git:
-        repo: "https://github.com/{{ item.org_name }}/{{ item.name }}.git"
+        repo: "https://gitlab.com/{{ item.org_name }}/{{ item.name }}.git"
         dest: "{{ pidev_user.homedir }}/{{ item.org_name }}/{{ item.name }}/"
         clone: "yes"
         version: "{{ item.version | default(omit) }}"

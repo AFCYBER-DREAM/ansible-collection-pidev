@@ -15,6 +15,7 @@
     - docker_user
     - docker_compose
     - docker_images
+    - piperci_gman
     - openfaas
     - piedpiper_faas
     - piedpiper_cli
@@ -58,6 +59,7 @@
     - docker_user
     - docker_compose
     - docker_images
+    - piperci_gman
     - piedpiper_faas
     - piedpiper_cli
   loop_control:
