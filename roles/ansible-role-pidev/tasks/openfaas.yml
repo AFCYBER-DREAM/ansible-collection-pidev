@@ -139,7 +139,7 @@
         - { key: services.gman.deploy.restart_policy.max_attempts, value: "10" }
         - { key: services.gman.deploy.restart_policy.window, value: "60s" }
         - { key: services.gman.hostname, value: "gman" }
-        - { key: services.gman.image, value: "piperci/gman:latest" }
+        - { key: services.gman.image, value: "gman:latest" }
         - { key: services.gman.networks, value: ["functions"] }
         - { key: services.gman.ports, value: ["8089:8080"] }
       notify:
