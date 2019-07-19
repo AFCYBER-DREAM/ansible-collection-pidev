@@ -27,5 +27,10 @@ pidev_piperci_cli:
 pidev_piperci_faas:
   - name: piperci-noop-faas
     url: https://gitlab.com
-    org_name: dingus9
-    version: piperci-flask
+    org_name: dreamer-labs/piperci
+    version: master
+
+pidev_secrets:
+  access-key-test: test
+  secret-key-test: test
+
