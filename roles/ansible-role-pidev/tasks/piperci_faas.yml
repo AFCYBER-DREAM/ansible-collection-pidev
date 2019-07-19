@@ -1,16 +1,16 @@
 ---
-- name: this block contains tasks related to piedpiper_faas
+- name: this block contains tasks related to piperci_faas
   block:
 
     - name: ensures latest versions of function repos have been cloned from SCM
       git:
-        repo: "https://github.com/{{ item.org_name }}/{{ item.name }}.git"
+        repo: "{{ item.url }}/{{ item.org_name }}/{{ item.name }}.git"
         dest: "{{ pidev_user.homedir }}/{{ item.org_name }}/{{ item.name }}/"
         version: "{{ item.version | default(omit) }}"
         clone: "yes"
         force: "yes"
       with_items:
-        - "{{ pidev_piedpiper_faas }}"
+        - "{{ pidev_piperci_faas }}"
       when: item.method | default("git") == "git"
       become: true
       become_user: "{{ pidev_user.name }}"
@@ -27,7 +27,7 @@
         owner: "no"
         group: "no"
       with_items:
-        - "{{ pidev_piedpiper_faas }}"
+        - "{{ pidev_piperci_faas }}"
       when: item.method | default("git") == "copy"
       notify:
         - deploy functions
@@ -39,8 +39,8 @@
         group: "{{ pidev_user.name }}"
         recurse: "yes"
       with_items:
-        - "{{ pidev_piedpiper_faas }}"
+        - "{{ pidev_piperci_faas }}"
       when: item.method | default("git") == "copy"
 
   tags:
-    - piedpiper_faas
+    - piperci_faas
