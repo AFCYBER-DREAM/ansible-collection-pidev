@@ -114,13 +114,28 @@
       notify:
         - deploy stack
 
-    - name: ensure docker secrets are stored
-      shell: "printf {{ item.value }} | docker secret create {{ item.key }} -"
+    - name: Check if docker secrets already exist
+      shell: |
+        "docker secret inspect {{ item.key }}"
       become: true
       become_user: "{{ pidev_user.name }}"
       become_method: "sudo"
       when: pidev_secrets is defined
+      loop: "{{ (pidev_secrets | default({})) | dict2items }}"
+      failed_when: False
+      register: docker_secrets_created
+
+    - name: create docker secrets
+      shell: "printf {{ item.value }} | docker secret create {{ item.key }} -"
+      become: true
+      when:
+        - pidev_secrets is defined
       loop: "{{ (pidev_secrets | default ({}))| dict2items }}"
+      register: test
+      changed_when: "'AlreadyExists' not in test.stderr"
+      failed_when:
+        - test.rc != 0
+        - (test.rc != 1 and 'AlreadyExists' not in test.stderr)
 
 
     - name: ensure minio settings are referenced in openfaas/faas docker-compose.yml file
