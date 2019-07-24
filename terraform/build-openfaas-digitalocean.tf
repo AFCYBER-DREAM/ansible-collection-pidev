@@ -23,14 +23,6 @@ resource "digitalocean_droplet" "openfaas" {
 
 }
 
-resource "digitalocean_project" "openfaas-dev" {
-  name        = "openfaas-dev-${var.user}"
-  description = "A project to hold temporary openfaas dev resources."
-  purpose     = "Development Support"
-  environment = "Development"
-  resources   = ["${digitalocean_droplet.openfaas.urn}"]
-}
-
 # Rerun provisioners on clean resources with null_resource
 resource "null_resource" "ansible_config" {
   count = "${var.run_provisioner ? 1 : 0}"
