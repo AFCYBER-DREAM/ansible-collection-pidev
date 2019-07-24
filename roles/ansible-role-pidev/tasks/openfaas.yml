@@ -86,6 +86,7 @@
         owner: "{{ pidev_user.name }}"
         group: "{{ pidev_user.name }}"
         mode: "0644"
+        remote_src: True
       when: clone_openfaas_faas is changed
       notify:
         - deploy stack
