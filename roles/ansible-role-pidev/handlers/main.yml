@@ -18,11 +18,13 @@
   failed_when: false
 
 - name: deploy functions
-  shell: "faas-cli build && faas-cli deploy"
+  shell: |
+    faas-cli template pull https://gitlab.com/dreamer-labs/piperci/piperci-faas-templates
+    faas-cli build && faas-cli deploy
   args:
     chdir: "{{ pidev_user.homedir }}/{{ item.org_name }}/{{ item.name }}/"
   with_items:
-    - "{{ pidev_piedpiper_faas }}"
+    - "{{ pidev_piperci_faas }}"
   become: true
   become_user: "{{ pidev_user.name }}"
   become_method: "su"
@@ -32,7 +34,7 @@
   args:
     chdir: "{{ pidev_user.homedir }}/{{ item.org_name }}/{{ item.name }}/"
   with_items:
-    - "{{ pidev_piedpiper_cli }}"
+    - "{{ pidev_piperci_cli }}"
 
 - name: build gman
   shell: "docker build -t gman ."

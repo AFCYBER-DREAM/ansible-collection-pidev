@@ -96,18 +96,18 @@ From `terraform/` run `terraform apply`
 
 Define your local faas function dir in `roles/ansible-role-pidev/defaults/main.yml`
 ```
-pidev_piedpiper_faas:
+pidev_piperci_faas:
 ...
-  - name: piedpiper-gman-faas
+  - name: piperci-gman-faas
     org_name: afcyber-dream
     method: copy
-    src: "{{ lookup('env','HOME') }}/piedpiper-gman-faas/"
+    src: "{{ lookup('env','HOME') }}/piperci-gman-faas/"
 ...
 ```
 
 ##### Run Terraform
 
-`terraform apply -var tags=piedpiper_faas`
+`terraform apply -var tags=piperci_faas`
 
 #### Manual deploy or "Pull" Method
 

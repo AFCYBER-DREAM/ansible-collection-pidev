@@ -17,8 +17,8 @@
     - docker_images
     - piperci_gman
     - openfaas
-    - piedpiper_faas
-    - piedpiper_cli
+    - piperci_faas
+    - piperci_cli
   loop_control:
     loop_var: "tasks"
   when:
@@ -60,8 +60,8 @@
     - docker_compose
     - docker_images
     - piperci_gman
-    - piedpiper_faas
-    - piedpiper_cli
+    - piperci_faas
+    - piperci_cli
   loop_control:
     loop_var: "tasks"
   when:

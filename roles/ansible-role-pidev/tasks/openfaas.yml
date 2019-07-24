@@ -107,11 +107,36 @@
       become: true
       become_user: "{{ pidev_user.name }}"
       become_method: "sudo"
+      when: pidev_secrets is not defined
       loop:
-        - access_key
-        - secret_key
+        - access-key
+        - secret-key
       notify:
         - deploy stack
+
+    - name: Check if docker secrets already exist
+      shell: |
+        "docker secret inspect {{ item.key }}"
+      become: true
+      become_user: "{{ pidev_user.name }}"
+      become_method: "sudo"
+      when: pidev_secrets is defined
+      loop: "{{ (pidev_secrets | default({})) | dict2items }}"
+      failed_when: False
+      register: docker_secrets_created
+
+    - name: create docker secrets
+      shell: "printf {{ item.value }} | docker secret create {{ item.key }} -"
+      become: true
+      when:
+        - pidev_secrets is defined
+      loop: "{{ (pidev_secrets | default ({}))| dict2items }}"
+      register: test
+      changed_when: "'AlreadyExists' not in test.stderr"
+      failed_when:
+        - test.rc != 0
+        - (test.rc != 1 and 'AlreadyExists' not in test.stderr)
+
 
     - name: ensure minio settings are referenced in openfaas/faas docker-compose.yml file
       yedit:
@@ -122,8 +147,8 @@
       become_user: "{{ pidev_user.name }}"
       become_method: "sudo"
       loop:
-        - { key: secrets.access_key.external, value: "true" }
-        - { key: secrets.secret_key.external, value: "true" }
+        - { key: secrets.access-key.external, value: "true" }
+        - { key: secrets.secret-key.external, value: "true" }
         - { key: services.minio.deploy.restart_policy.delay, value: "10s" }
         - { key: services.minio.deploy.restart_policy.max_attempts, value: "10" }
         - { key: services.minio.deploy.restart_policy.window, value: "60s" }
@@ -132,8 +157,9 @@
         - { key: services.minio.networks, value: ["functions"] }
         - { key: services.minio.ports, value: ["9000:9000"] }
         - { key: services.minio.command, value: "server /export" }
-        - { key: services.minio.secrets, value: ["secret_key", "access_key"] }
+        - { key: services.minio.secrets, value: ["secret-key", "access-key"] }
         - { key: services.minio.volumes, value: ["minio_data:/export"] }
+        - { key: services.minio.environment, value: ["MINIO_ACCESS_KEY_FILE=access-key", "MINIO_SECRET_KEY_FILE=secret-key"] }
         - { key: volumes.minio_data.driver, value: "local" }
         - { key: services.gman.deploy.restart_policy.delay, value: "10s" }
         - { key: services.gman.deploy.restart_policy.max_attempts, value: "10" }

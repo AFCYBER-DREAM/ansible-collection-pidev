@@ -14,31 +14,23 @@ pidev_docker_images:
 
 pidev_piperci_gman:
   - name: piperci-gman
+    url: https://gitlab.com
     org_name: dreamer-labs/piperci
     version: master
 
-pidev_piedpiper_cli:
-  - name: piedpiper-picli
-    org_name: afcyber-dream
+pidev_piperci_cli:
+  - name: piperci-picli
+    url: https://gitlab.com
+    org_name: dreamer-labs/piperci
     version: master
 
-pidev_piedpiper_faas:
-  - name: piedpiper-validator-faas
-    org_name: afcyber-dream
+pidev_piperci_faas:
+  - name: piperci-noop-faas
+    url: https://gitlab.com
+    org_name: dreamer-labs/piperci
     version: master
-  - name: piedpiper-cpplint-faas
-    org_name: afcyber-dream
-    version: master
-  - name: piedpiper-flake8-faas
-    org_name: afcyber-dream
-    version: master
-  - name: piedpiper-pylint-faas
-    org_name: afcyber-dream
-    version: master
-  - name: piedpiper-pybandit-faas
-    org_name: afcyber-dream
-    version: master
-  # - name: piedpiper-myfunc-faas
-  #   org_name: afcyber-dream
-  #   method: copy
-  #   src: "{{ lookup('env','HOME') }}/Projects/piedpiper-myfunc-faas/"
+
+pidev_secrets:
+  access-key-test: test
+  secret-key-test: test
+
