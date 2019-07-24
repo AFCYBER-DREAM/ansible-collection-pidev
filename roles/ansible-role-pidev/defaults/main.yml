@@ -31,6 +31,6 @@ pidev_piperci_faas:
     version: master
 
 pidev_secrets:
-  access-key-test: test
-  secret-key-test: test
+  access-key: test
+  secret-key: test
 
