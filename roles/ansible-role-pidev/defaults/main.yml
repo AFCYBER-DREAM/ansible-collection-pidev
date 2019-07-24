@@ -12,12 +12,6 @@ pidev_docker_images:
   - name: ubuntu
     tag: 18.04
 
-pidev_piperci_gman:
-  - name: piperci-gman
-    url: https://gitlab.com
-    org_name: dreamer-labs/piperci
-    version: master
-
 pidev_piperci_cli:
   - name: piperci-picli
     url: https://gitlab.com
