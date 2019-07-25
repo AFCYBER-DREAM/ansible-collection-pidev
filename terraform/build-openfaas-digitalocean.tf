@@ -16,7 +16,7 @@ provider "digitalocean" {
 
 resource "digitalocean_droplet" "openfaas" {
   image  = "ubuntu-18-04-x64"
-  name   = "openfaas-1"
+  name   = "openfaas-1-${var.user}"
   region = "nyc1"
   size   = "s-1vcpu-2gb"
   ssh_keys = "${var.do_keys}"
