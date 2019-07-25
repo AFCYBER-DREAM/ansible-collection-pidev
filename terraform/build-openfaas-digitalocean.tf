@@ -16,19 +16,11 @@ provider "digitalocean" {
 
 resource "digitalocean_droplet" "openfaas" {
   image  = "ubuntu-18-04-x64"
-  name   = "openfaas-1"
+  name   = "openfaas-1-${var.user}"
   region = "nyc1"
   size   = "s-1vcpu-2gb"
   ssh_keys = "${var.do_keys}"
 
-}
-
-resource "digitalocean_project" "openfaas-dev" {
-  name        = "openfaas-dev-${var.user}"
-  description = "A project to hold temporary openfaas dev resources."
-  purpose     = "Development Support"
-  environment = "Development"
-  resources   = ["${digitalocean_droplet.openfaas.urn}"]
 }
 
 # Rerun provisioners on clean resources with null_resource
