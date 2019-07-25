@@ -36,9 +36,3 @@
   with_items:
     - "{{ pidev_piperci_cli }}"
 
-- name: build gman
-  shell: "docker build -t gman ."
-  args:
-    chdir: "{{ pidev_user.homedir }}/{{ item.org_name }}/{{ item.name }}/"
-  with_items:
-    - "{{ pidev_piperci_gman }}"
