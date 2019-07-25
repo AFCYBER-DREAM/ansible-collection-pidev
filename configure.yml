@@ -3,5 +3,8 @@
   gather_facts: true
 
   roles:
-    - "ansible-role-pidev"
+    - role: "ansible-role-pidev"
+      pidev_secrets:
+        access-key: "{{ lookup('env','ACCESS_KEY') or 'test' }}"
+        secret-key: "{{ lookup('env','SECRET_KEY') or 'test_secret' }}"
 ...
